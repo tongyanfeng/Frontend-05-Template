@@ -1,0 +1,70 @@
+<style>
+.lights {
+  display: flex;
+}
+.light {
+  width:  60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 10px;
+  background-color: #000;
+}
+.red {
+  background-color: red;
+}
+.yellow {
+  background-color: yellow;
+}
+.green {
+  background-color: green;
+}
+.time {
+  width: 100px;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  font-size: 40px;
+}
+</style>
+<div class="lights">
+  <div id="red" class="light"></div>
+  <div id="yellow" class="light"></div>
+  <div id="green" class="light"></div>
+</div>
+<script>
+  let green = document.getElementById('green')
+  let yellow = document.getElementById('yellow')
+  let red = document.getElementById('red')
+  let time = document.getElementById('time')
+
+  const intarval = [{
+    id: 'green',
+    time: 10
+  }, {
+    id: 'yellow',
+    time: 2
+  }, {
+    id: 'red',
+    time: 5
+  }]
+
+  let num = 0
+  function light (id = 0, time) {
+    let div = document.getElementById(intarval[id].id)
+    div.style.backgroundColor = intarval[id].id
+    let reset = intarval.filter(item => item.id !== intarval[id].id)
+    reset.forEach(item => {
+      let div = document.getElementById(item.id)
+      div.style.backgroundColor = 'black'
+    })
+    ++id
+    if(id >= 3) {
+      id = 0
+    }
+    let nextTime = intarval[id].time
+    setTimeout(() => {
+      light(id, nextTime)
+    }, time * 1000)
+  }
+  light(0, 10)
+</script>
