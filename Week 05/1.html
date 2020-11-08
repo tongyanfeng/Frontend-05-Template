@@ -1,0 +1,92 @@
+<div id="container">文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 
+  
+</div>
+
+
+<div id="dragable" style="display: inline-block; width: 100px; height:100px; background-color: pink;"></div>
+
+
+<script>
+  let dragable = document.getElementById("dragable")
+
+  let baseX = 0, baseY = 0
+
+  dragable.addEventListener("mousedown", function(event) {
+
+    let startX = event.clientX, startY = event.clientY
+
+
+    // 若在此处监听的是 dragable 的话，会导致，在鼠标移出浏览器的时候，会出现监听事件失效
+    // 并且若是监听 dragable 的话，则在鼠标移动快的时候，鼠标移出 dragable 的物体上，就会出现，拖拽断层，也就是拖拽停止的情况
+    let up = event => {
+      baseX = baseX + event.clientX - startX
+      baseY = baseY + event.clientY - startY
+      document.removeEventListener("mousemove", move)
+      document.removeEventListener("mouseup", up)
+    }
+
+    let move = event => {
+      console.log(event);
+
+      let range = getNearest(event.clientX, event.clientY)
+      range.insertNode(dragable)
+      // dragable.style.transform = `translate(${baseX + event.clientX - startX}px, ${baseY + event.clientY - startY}px)`
+    }
+
+    document.addEventListener("mousemove", move)
+    document.addEventListener("mouseup", up)
+
+  })
+
+  let ranges = []
+
+  let container = document.getElementById("container")
+
+  for(let i = 0; i < container.childNodes[0].textContent.length; i++) {
+    let range = document.createRange()
+
+    range.setStart(container.childNodes[0], i)
+    range.setEnd(container.childNodes[0], i)
+
+    ranges.push(range)
+  }
+
+  function getNearest(x, y) {
+    let min = Infinity;
+    let nearset = null
+
+    for(let range of ranges) {
+      let rect = range.getBoundingClientRect()
+      let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2
+
+      if (distance < min) {
+        nearset = range
+        min = distance
+      }
+    }
+
+    return nearset
+  }
+
+  document.addEventListener("selectstart", event => event.preventDefault())
+</script>
