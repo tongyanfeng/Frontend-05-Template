@@ -34,7 +34,7 @@ Undefined、Symbol、BigInt
   ISO-8859
   BIG5
   把一个 string 所代表的字节给转换出来
-```
+```javascript
   function UTF8_Encoding(string) {
     // return new Buffer()
     var bytes = new Array(); 

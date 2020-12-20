@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>match</title>
+  </head>
+  <body>
+    <div>
+      <div id="id" class="class">i am #id</div>
+    </div>
+    <script>
+      /*
+       ** 编写一个 match 函数。它接收两个参数，第一个参数是一个选择器字符串性质，第二个是一个 HTML 元素。
+       ** @param {string} selector
+       ** @param {HTMLElement} element
+       */
+      const EOF = Symbol("EOF");
+
+      let currentElement = { id: "", class: [], tag: "" };
+      let selectorElements = [];
+      let currentClass = "";
+
+      function match(selector, element) {
+        // div.class#id
+        reverseSelector = selector.split(" ").reverse();
+        let state;
+        for (const s of reverseSelector) {
+          currentElement = { id: "", class: [], tag: "" };
+          state = beginMatch;
+          for (const c of s) {
+            state = state(c);
+          }
+          state = state(EOF);
+          selectorElements.push(currentElement);
+        }
+        if (!matchElement(selectorElements[0], element)) return false;
+        let j = 1;
+        while (element.parentElement) {
+          element = element.parentElement;
+          if (matchElement(selectorElements[j], element)) j++;
+          if (j >= selectorElements.length) return true;
+        }
+        return false;
+      }
+
+      function matchElement(selector, element) {
+        if (!selector) return false;
+        if (selector.id && selector.id !== element.id) return false;
+        if (selector.tag && selector.tag.toUpperCase() !== element.tagName)
+          return false;
+        if (selector.class.length) {
+          for (const cls of selector.class) {
+            if ([...element.classList].indexOf(cls) < 0) return false;
+          }
+        }
+        return true;
+      }
+
+      function beginMatch(c) {
+        if (c === "#") {
+          return idMatch;
+        } else if (c === ".") {
+          currentClass = "";
+          return classMatch;
+        } else {
+          return tagMatch(c);
+        }
+      }
+      function idMatch(c) {
+        if (["#", "."].indexOf(c) > -1) {
+          return beginMatch(c);
+        } else if (c === EOF) {
+        } else {
+          currentElement.id += c;
+          return idMatch;
+        }
+      }
+      function classMatch(c) {
+        if (c === "#") {
+          return beginMatch(c);
+        } else if (c === ".") {
+          currentElement.class.push(currentClass);
+          return beginMatch(c);
+        } else if (c === EOF) {
+          currentElement.class.push(currentClass);
+        } else {
+          currentClass += c;
+          return classMatch;
+        }
+      }
+      function tagMatch(c) {
+        if (["#", "."].indexOf(c) > -1) {
+          return beginMatch(c);
+        } else if (c === EOF) {
+        } else {
+          currentElement.tag += c;
+          return tagMatch;
+        }
+      }
+
+      console.log(
+        "div #id.class",
+        match("div #id.class", document.getElementById("id"))
+      );
+    </script>
+  </body>
+</html>
